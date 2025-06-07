@@ -1,0 +1,58 @@
+.mainHeading {
+    display: flex;
+    height: 5rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.pickerContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 2rem;
+    background-color: #c2d4f1;
+    border-radius: 10px;
+    border-color: 10px red;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dateInputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+label {
+    font-weight: 600;
+    margin-right: 0.5rem;
+    color: #333;
+}
+
+input[type="date"] {
+    height: 2.5rem;
+    width: 12rem;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: #333;
+}
+
+.pickerSearch {
+    height: 2.8rem;
+    padding: 0 1.5rem;
+    background-color: #007bff;
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pickerSearch:hover {
+    background-color: #0056b3;
+}
