@@ -1,0 +1,28 @@
+.mainSummaryContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.summary {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-right: 27.5em;
+    margin-top: 3rem;
+}
+
+.summaryBoxes {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    gap: 0.5rem;
+}
+
+.box {
+    font-size: 1rem;
+    border: 1px solid gray;
+    border-radius: 0.5rem;
+    margin-left: 3rem;
+    padding: 1rem 5.5rem 2rem 2rem;
+}
