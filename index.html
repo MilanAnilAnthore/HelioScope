@@ -5,24 +5,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nasa Weather Api tracker</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@300..700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles/generalStyle.css  ">
-    <link rel="stylesheet" href="styles/dateContainer.css  ">
-    <link rel="stylesheet" href="styles/dataContainer.css  ">
-
+    <link rel="stylesheet" href="styles/headerStyle.css  ">
+    <link rel="stylesheet" href="styles/dateStyle.css  ">
+    <link rel="stylesheet" href="styles/infoBoxStyle.css  ">
 </head>
 
 <body class="black">
 
-    <div class="mainHeading">
-        <h1>Space Weather Tracker – Solar Flare</h1>
-    </div>
+    <section id="header">
+        <div class="mainHeader">
+            <div class="leftSection">
+                <p class="mainTitle">HelioScope</p>
+            </div>
+        </div>
+        <div class="activityHeading">Solar Flare Activity</div>
+    </section>
+
 
     <div class="pickerContainer">
         <div class="dateInputs">
             <label for="fromDate">From:</label>
             <input type="date" name="fromDate" id="fromDate">
 
-            <label for="endDate">End:</label>
+            <label for="endDate">To:</label>
             <input type="date" name="endDate" id="endDate">
         </div>
         <div>
@@ -30,14 +39,29 @@
         </div>
     </div>
 
-    <div class="mainContainer">
+
+    <div class="mainSummaryContainer">
+        <div>Summary</div>
         <div>
-            Solar Flare ID: 2025-06-01T03:00:00-FLR001
+            <div>
+                <p>Total Flares</p>
+                <span>0</span>
+            </div>
+            <div>
+                <p>Strongest Flare</p>
+                <span>XX.X</span>
+            </div>
+            <div>
+                <p>Most Active region</p>
+                <span>XXXXXX</span>
+            </div>
+            <div>
+                <p>Peak Time</p>
+                <span>XX:XX UTC</span>
+            </div>
         </div>
+
     </div>
-
-
-
 
     <!-- <button class="themeMode">Toggle Theme</button> -->
 
