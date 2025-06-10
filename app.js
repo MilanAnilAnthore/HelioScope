@@ -10,6 +10,7 @@ const pickerSearch = document.querySelector('.pickerSearch');
 const api = "2RptH3VHc9l03KbmaL2iY9sws37rdlfNyburl0u2";
 let retrievedFromDate;
 let retrievedEndDate;
+let data;
 
 
 function initializeDate() {
@@ -47,7 +48,7 @@ pickerSearch.addEventListener('click', () => {
 
         getData(retrievedFromDate, retrievedEndDate);
     } else {
-        alert('The from date should always be  than end date')
+        alert('The from date should always be less than end date')
     }
 
 })
@@ -59,8 +60,8 @@ async function getData(startDate, toDate) {
     try {
         const response = await fetch(`https://api.nasa.gov/DONKI/FLR?startDate=${startDate}&endDate=${toDate}&api_key=${api}`)
         if (response.ok) {
-            const data = await response.json();
-            console.log(data);
+            data = await response.json();
+            allData(data);
         } else {
             throw new Error('Failed to fetch data');
         }
@@ -70,6 +71,10 @@ async function getData(startDate, toDate) {
 }
 
 
+function allData() {
+    let length = data.length;
+
+}
 
 
 // // This is for the toggling of theme
