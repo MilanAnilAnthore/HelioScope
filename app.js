@@ -69,13 +69,14 @@ async function getData(startDate, toDate) {
 }
 
 
-let result = [];
-let highestPeakTimeMinutes = null;
-let highestPeakTime;
-let duration;
+
+
 
 function allData(data) {
-    result = [];
+    let result = [];
+    let highestPeakTimeMinutes = null;
+    let highestPeakTime;
+    let duration;
     for (let d of data) {
         if (d.peakTime) {
             const p = new Date(d.peakTime);
@@ -133,10 +134,12 @@ function allData(data) {
             location,
             occuranceTime,
             activeRegion,
-            linkedEvents
+            linkedEvents,
+            highestPeakTime,
+            duration
         });
     }
-    return result;
+    let topActiveRegionResult = topActiveRegion(result);
 }
 
 function milliSecConverter(mls) {
@@ -157,11 +160,23 @@ function milliSecConverter(mls) {
 }
 
 
-// // This is for the toggling of theme
-// themeMode.addEventListener('click', () => {
-//     body.classList.toggle('white')
-// })
+function topActiveRegion(rsAR) {
+    let regionCount = {};
+    let maxCount = 0;
+    let highestRecordedAR = null;
 
+    for (let count of rsAR) {
+        let region = count.activeRegion;
+        if (region != undefined) {
+            regionCount[region] = (regionCount[region] || 0) + 1;
+            if (regionCount[region] > maxCount) {
+                maxCount = regionCount[region];
+                highestRecordedAR = region;
+            }
+        }
+    }
+    return highestRecordedAR;
+}
 
 
 

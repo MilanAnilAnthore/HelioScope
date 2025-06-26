@@ -5,10 +5,14 @@
     justify-content: center;
 }
 
+.summaryBox {
+    display: flex;
+}
+
 .summary {
     font-size: 2rem;
     font-weight: 500;
-    margin-right: 27.5em;
+    margin-right: 29.5em;
     margin-top: 3rem;
 }
 
