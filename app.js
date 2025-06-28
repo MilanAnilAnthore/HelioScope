@@ -6,23 +6,33 @@ const endDate = document.querySelector('#endDate');
 const pickerSearch = document.querySelector('.pickerSearch');
 
 
-// Variables
+// API key for fetching data from the NASA DONKI API
 const api = "2RptH3VHc9l03KbmaL2iY9sws37rdlfNyburl0u2";
+// Variable to store the fetched data
 let data;
 
 
 
-
+/**
+ * Initializes the date pickers with default values:
+ * - `endDate`: today's date
+ * - `fromDate`: 30 days prior to today
+ */
 function initializeDate() {
 
     const today = new Date();
     const thirtyDaysAgo = new Date();
 
+    // Set the date to 30 days ago
     thirtyDaysAgo.setUTCDate(today.getUTCDate() - 30);
 
+    // Function to fetch the current utc date.
     function formatDate(date) {
+        // gets the UTC year
         const year = date.getUTCFullYear();
+        // Gets the months and padstart is assigned that it would always consist of 2digits.
         const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+        // Gets the day and padstart is assigned that it would always consist of 2digits.
         const day = String(date.getUTCDate()).padStart(2, '0');
         return `${year}-${month}-${day}`
     }
@@ -30,24 +40,31 @@ function initializeDate() {
     const defaultEndDate = formatDate(today);
     const defaultStartDate = formatDate(thirtyDaysAgo);
 
+    // updating the value of fromDate date picker.
     fromDate.value = defaultStartDate;
+    // updating the value of toDate date picker.
     endDate.value = defaultEndDate;
 
 }
 
+// Run the initialization
 initializeDate();
 
 
-
+// Add click event listener to the search button
 pickerSearch.addEventListener('click', () => {
 
+    // Validate that the end date is after the start date
     if (endDate.value > fromDate.value) {
 
+        // Assigning the dates to respective variable for further fetching of data.
         let retrievedFromDate = fromDate.value;
         let retrievedEndDate = endDate.value;
 
+        // Fetch data for the specified date range
         getData(retrievedFromDate, retrievedEndDate);
     } else {
+        // alert if the validation fails.
         alert('The from date should always be less than end date')
     }
 
@@ -55,12 +72,17 @@ pickerSearch.addEventListener('click', () => {
 
 
 
-
+/**
+ * Fetches solar flare data from NASA's DONKI API for a given date range
+ */
 async function getData(startDate, toDate) {
+    // try catch to execute fetching and to catch any errors.
     try {
         const response = await fetch(`https://api.nasa.gov/DONKI/FLR?startDate=${startDate}&endDate=${toDate}&api_key=${api}`)
         if (response.ok) {
+            // if the response is ok the response is turned to a json file.
             data = await response.json();
+            // Then the data is passed to a function for further manipulation.
             allData(data);
         } else {
             throw new Error('Failed to fetch data');
