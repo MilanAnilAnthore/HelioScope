@@ -11,6 +11,8 @@ const api = "2RptH3VHc9l03KbmaL2iY9sws37rdlfNyburl0u2";
 let data;
 
 
+
+
 function initializeDate() {
 
     const today = new Date();
@@ -76,8 +78,9 @@ function allData(data) {
     let result = [];
     let highestPeakTimeMinutes = null;
     let highestPeakTime;
-    let duration;
+    let totalFlares = data.length;
     for (let d of data) {
+        let duration;
         if (d.peakTime) {
             const p = new Date(d.peakTime);
             let minutes = p.getTime();
@@ -115,7 +118,7 @@ function allData(data) {
         let peakTime = d.peakTime ? d.peakTime.slice(11, 16) : null;
         let endTime = d.endTime ? d.endTime.slice(11, 16) : null;
         let intensity = d.classType ? d.classType.slice(0, 1) : null;
-        let magnitude = d.classType ? d.classType.slice(1, 4) : null;
+        let magnitude = d.classType ? parseFloat(d.classType.slice(1)) || 0 : 0;
         let instrumentUsed = d.instruments && d.instruments[0] ? d.instruments[0].displayName : "N/A";
         let location = d.sourceLocation || "Unknown";
         let occuranceTime = d.flrID ? d.flrID.slice(0, 10) : "Unknown";
@@ -135,11 +138,18 @@ function allData(data) {
             occuranceTime,
             activeRegion,
             linkedEvents,
-            highestPeakTime,
             duration
         });
+
+
     }
+    const commonResult = {
+        highestPeakTime,
+        totalFlares
+    };
+
     let topActiveRegionResult = topActiveRegion(result);
+    let highestIntensity = findMaxIntensity(result);
 }
 
 function milliSecConverter(mls) {
@@ -179,5 +189,44 @@ function topActiveRegion(rsAR) {
 }
 
 
+function findMaxIntensity(rsINT) {
+    const powerLevels = {
+        A: 0,
+        B: 1,
+        C: 2,
+        M: 3,
+        X: 4
+    }
+    let highestINT;
+    let highestMAG;
+    let highestPower = 0;
+    for (let int of rsINT) {
+        let intensity = int.intensity;
+        let magnitude = int.magnitude;
+
+        let score = powerLevels[intensity] * 10 + magnitude;
+
+        if (score > highestPower) {
+            highestPower = score;
+            highestINT = intensity;
+            highestMAG = magnitude
+        }
+    }
+    return { highestINT, highestMAG };
+}
+// Total Flares = Total number of flares in the given period of time.
+// Max Intensity Flare = The Flare with the maximum intensity in the given set of data.
+// Top Active Region = The region with the top number of flare activity in the given set of data.
+// Highest Peak Time = The Highest peak time of a flare from the set of flares.
+
+
+// Intensity = Intensity of the flare.
+// Instrument = Instrument used the track the flare.
+// Solar location = The exact location where the flare was recorded.
+// Start Time = The time when the flare began
+// Active Region = The region where the solar location is situated
+// Duration = The entire duration of the Flare.
+// Flare peak = The top most peak the flare was recorded
+// Linked events = The number of linked events.
 
 
