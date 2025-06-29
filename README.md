@@ -19,7 +19,7 @@
 
 ## 💻 Demo
 
-> **Live Demo:** [View on Vercel](helioscope.vercel.app)  
+> **Live Demo:** [View on Vercel](https://helioscope.vercel.app/)  
 
 ---
 
