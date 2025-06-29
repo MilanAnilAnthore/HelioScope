@@ -319,9 +319,16 @@ function summaryInjector(processedFlareData) {
     highestPeakTime.innerText = processedFlareData.summaryResult.highestPeakTime + ' UTC';
 }
 
+function clearTable() {
+    tableBody.innerHTML = '';
+}
+
+
 function tableInjector(processedFlareData) {
 
-    for (res of processedFlareData.result) {
+    clearTable();
+
+    for (const res of processedFlareData.result) {
         console.log(res);
         var row = tableBody.insertRow(0);
 
