@@ -1,9 +1,23 @@
+// General DOM Elements
 const body = document.querySelector('body');
 const themeMode = document.querySelector('.themeMode');
-const pickerContainer = document.querySelector('.pickerContainer');
+
+// Date DOM Elements
 const fromDate = document.querySelector('#fromDate');
 const endDate = document.querySelector('#endDate');
 const pickerSearch = document.querySelector('.pickerSearch');
+
+
+// Summary DOM Elements
+const totalFlares = document.querySelector('.totalFlares');
+const maxIntensityFlare = document.querySelector('.maxIntensityFlare');
+const topActiveRegionClass = document.querySelector('.topActiveRegion')
+const highestPeakTime = document.querySelector('.highestPeakTime')
+
+
+// Individual Table Flare Data DOM Elements
+
+
 
 
 // API key for fetching data from the NASA DONKI API
@@ -85,7 +99,8 @@ async function getData(fromDate, endDate) {
         if (response.ok) {
             // if the response is ok the response is turned to a json file.
             data = await response.json();
-            processFlareData(data);
+            let processedFlareData = processFlareData(data);
+            summaryInjector(processedFlareData);
             return data;
         } else {
             throw new Error('Failed to fetch data');
@@ -210,6 +225,8 @@ function processFlareData(data) {
 
     let topActiveRegionResult = topActiveRegion(result);
     let highestIntensity = findMaxIntensity(result);
+
+    return { result, summaryResult, topActiveRegionResult, highestIntensity }
 }
 
 
@@ -263,8 +280,7 @@ function topActiveRegion(rsAR) {
 /**
  * function to find the max intensity of flare from retrieved set of data
  * @param rsINT Parameter used to receive the data consisting of intensity and magnitude
- * @returns highestINT - The highest intensity from the data
- * @returns highestMAG - The magnitude associated with the intensity
+ * @returns mergedIntensity - The highest intensity from the data
  */
 function findMaxIntensity(rsINT) {
     const powerLevels = {
@@ -289,7 +305,18 @@ function findMaxIntensity(rsINT) {
             highestMAG = magnitude
         }
     }
-    return { highestINT, highestMAG };
+    let mergedIntensity = `${highestINT} ${highestMAG}`
+
+    return mergedIntensity
+}
+
+
+function summaryInjector(processedFlareData) {
+    console.log(processedFlareData)
+    totalFlares.innerText = processedFlareData.summaryResult.totalFlares;
+    maxIntensityFlare.innerText = processedFlareData.highestIntensity;
+    topActiveRegionClass.innerText = processedFlareData.topActiveRegionResult;
+    highestPeakTime.innerText = processedFlareData.summaryResult.highestPeakTime + ' UTC';
 }
 
 // Key Metrics:
