@@ -8,6 +8,7 @@ const pickerSearch = document.querySelector('.pickerSearch');
 
 // API key for fetching data from the NASA DONKI API
 const api = "2RptH3VHc9l03KbmaL2iY9sws37rdlfNyburl0u2";
+
 // Variable to store the fetched data
 let data;
 
@@ -26,23 +27,22 @@ function initializeDate() {
     // Set the date to 30 days ago
     thirtyDaysAgo.setUTCDate(today.getUTCDate() - 30);
 
-    // Function to fetch the current utc date.
+    /**
+     * Function to fetch the current utc date.
+     * @param date Variable which is passed to fetch the current UTC date
+     * @returns the formatted date in YYYY/MM/DD format
+     */
     function formatDate(date) {
-        // gets the UTC year
         const year = date.getUTCFullYear();
-        // Gets the months and padstart is assigned that it would always consist of 2digits.
         const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-        // Gets the day and padstart is assigned that it would always consist of 2digits.
         const day = String(date.getUTCDate()).padStart(2, '0');
         return `${year}-${month}-${day}`
     }
 
     const defaultEndDate = formatDate(today);
-    const defaultStartDate = formatDate(thirtyDaysAgo);
+    const defaultFromDate = formatDate(thirtyDaysAgo);
 
-    // updating the value of fromDate date picker.
-    fromDate.value = defaultStartDate;
-    // updating the value of toDate date picker.
+    fromDate.value = defaultFromDate;
     endDate.value = defaultEndDate;
 
 }
@@ -74,16 +74,19 @@ pickerSearch.addEventListener('click', () => {
 
 /**
  * Fetches solar flare data from NASA's DONKI API for a given date range
+ * @param fromDate The from date selected by the user
+ * @param endDate The To date selected by the user
+ * @returns data fetched from the DONKI API
  */
-async function getData(startDate, toDate) {
+async function getData(fromDate, endDate) {
     // try catch to execute fetching and to catch any errors.
     try {
-        const response = await fetch(`https://api.nasa.gov/DONKI/FLR?startDate=${startDate}&endDate=${toDate}&api_key=${api}`)
+        const response = await fetch(`https://api.nasa.gov/DONKI/FLR?startDate=${fromDate}&endDate=${endDate}&api_key=${api}`)
         if (response.ok) {
             // if the response is ok the response is turned to a json file.
             data = await response.json();
-            // Then the data is passed to a function for further manipulation.
-            allData(data);
+            processFlareData(data);
+            return data;
         } else {
             throw new Error('Failed to fetch data');
         }
@@ -95,12 +98,17 @@ async function getData(startDate, toDate) {
 
 
 
-
-function allData(data) {
+/**
+ * The function which changes the raw data in a format that would enable users to understand.
+ * @param data The json data fetched from the api.
+ */
+function processFlareData(data) {
     let result = [];
     let highestPeakTimeMinutes = null;
     let highestPeakTime;
     let totalFlares = data.length;
+
+    // Helps to find the highestPeakTime of flare from the set of flares in the data
     for (let d of data) {
         let duration;
         if (d.peakTime) {
@@ -112,6 +120,11 @@ function allData(data) {
             }
         }
 
+        /**
+         * Helps to find the duration of each flares
+         * If the endTime is null the difference between peakTime and beginTime is taken for duration
+         * If the endTime is not null then the difference between endTime and beginTime is used to measure duration.
+         */
         if (d.endTime == null) {
             let bt = new Date(d.beginTime);
             let pt = new Date(d.peakTime);
@@ -136,19 +149,42 @@ function allData(data) {
             }
         }
 
+        // Extracts the beginTime for flare and if its not available then its assigned null
         let beginTime = d.beginTime ? d.beginTime.slice(11, 16) : null;
+
+        // Extracts the peakTime for flare and if its not available then its assigned null
         let peakTime = d.peakTime ? d.peakTime.slice(11, 16) : null;
+
+        // Extracts the endTime for flare and if its not available then its assigned null
         let endTime = d.endTime ? d.endTime.slice(11, 16) : null;
+
+        // Extracts the intensity for flare and if its not available then its assigned null
         let intensity = d.classType ? d.classType.slice(0, 1) : null;
+
+        /**
+         * Extracts the magnitude for flare and parse it from string to float for calculation.
+         * If magnitude is not available then its assigned with 0.0 a fall back value.
+         */
         let magnitude = d.classType ? parseFloat(d.classType.slice(1)) || 0 : 0;
+
+        // Extracts the instrumentUsed to track the flare.
         let instrumentUsed = d.instruments && d.instruments[0] ? d.instruments[0].displayName : "N/A";
+
+        // Extracts the location of flare and if not available set to unKnown
         let location = d.sourceLocation || "Unknown";
+
+        // Extracts the occuranceTime of flare and if not available set to unKnown
         let occuranceTime = d.flrID ? d.flrID.slice(0, 10) : "Unknown";
+
+        // Extracts the activeRegion of flare and if not available set to null
         let activeRegion = d.activeRegionNum || null;
+
+        // Safely extract an array of activity IDs from linkedEvents if it exists and is an array; otherwise, set to null
         let linkedEvents = Array.isArray(d.linkedEvents)
             ? d.linkedEvents.map(event => event.activityID)
             : null;
 
+        // push the values of flare into an array called result
         result.push({
             beginTime,
             peakTime,
@@ -165,7 +201,9 @@ function allData(data) {
 
 
     }
-    const commonResult = {
+
+    // SummaryResult of data like peakTime and total flares.
+    const summaryResult = {
         highestPeakTime,
         totalFlares
     };
@@ -174,6 +212,12 @@ function allData(data) {
     let highestIntensity = findMaxIntensity(result);
 }
 
+
+/**
+ * Function to convert milliseconds to different time formats.
+ * @param mls The parameter used to pass the milliseconds to be calculated.
+ * @returns The converted millisecond 
+ */
 function milliSecConverter(mls) {
     let totalSeconds = (mls / 1000).toFixed(1);
     let totalMinutes = (mls / (1000 * 60)).toFixed(1);
@@ -191,12 +235,17 @@ function milliSecConverter(mls) {
     }
 }
 
-
+/**
+ * function to find the most active region consisting of highest number of flares.
+ * @param rsAR Parameter used to receive the data consisting of active regions
+ * @returns The highestRecorded region after comparing all the regions in data
+ */
 function topActiveRegion(rsAR) {
     let regionCount = {};
     let maxCount = 0;
     let highestRecordedAR = null;
 
+    // Using hashmapping for easy comparison between regions.
     for (let count of rsAR) {
         let region = count.activeRegion;
         if (region != undefined) {
@@ -211,6 +260,12 @@ function topActiveRegion(rsAR) {
 }
 
 
+/**
+ * function to find the max intensity of flare from retrieved set of data
+ * @param rsINT Parameter used to receive the data consisting of intensity and magnitude
+ * @returns highestINT - The highest intensity from the data
+ * @returns highestMAG - The magnitude associated with the intensity
+ */
 function findMaxIntensity(rsINT) {
     const powerLevels = {
         A: 0,
@@ -236,19 +291,23 @@ function findMaxIntensity(rsINT) {
     }
     return { highestINT, highestMAG };
 }
-// Total Flares = Total number of flares in the given period of time.
-// Max Intensity Flare = The Flare with the maximum intensity in the given set of data.
-// Top Active Region = The region with the top number of flare activity in the given set of data.
-// Highest Peak Time = The Highest peak time of a flare from the set of flares.
+
+// Key Metrics:
+// - Total Flares
+// - Max Intensity Flare
+// - Top Active Region
+// - Highest Peak Time
+
+// Flare Details:
+// - Intensity
+// - Instrument
+// - Solar Location
+// - Start Time
+// - Active Region
+// - Duration
+// - Flare Peak
+// - Linked Events
 
 
-// Intensity = Intensity of the flare.
-// Instrument = Instrument used the track the flare.
-// Solar location = The exact location where the flare was recorded.
-// Start Time = The time when the flare began
-// Active Region = The region where the solar location is situated
-// Duration = The entire duration of the Flare.
-// Flare peak = The top most peak the flare was recorded
-// Linked events = The number of linked events.
 
 
