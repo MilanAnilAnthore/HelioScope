@@ -31,3 +31,21 @@
     margin-left: 3rem;
     padding: 1rem 5.5rem 2rem 2rem;
 }
+
+@media (max-width: 900px) {
+    .summary {
+        margin-right: 0;
+    }
+
+    .summaryBoxes {
+        flex-direction: column;
+        align-items: stretch;
+        padding-right: 0;
+        gap: 1rem;
+    }
+
+    .box {
+        margin-left: 0;
+        padding: 1rem 1rem 1rem 1rem;
+    }
+}

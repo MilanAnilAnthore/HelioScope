@@ -361,6 +361,7 @@ function tableInjector(processedFlareData) {
             linkedEventsCell.innerHTML = `${res.linkedEvents.length}`;
         }
     }
+
 }
 // Key Metrics:
 // - Total Flares
