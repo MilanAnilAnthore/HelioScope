@@ -1,6 +1,7 @@
 // General DOM Elements
 const body = document.querySelector('body');
 const themeMode = document.querySelector('.themeMode');
+const loader = document.querySelector('.loader')
 
 // Date DOM Elements
 const fromDate = document.querySelector('#fromDate');
@@ -94,6 +95,7 @@ pickerSearch.addEventListener('click', () => {
  */
 async function getData(fromDate, endDate) {
     // try catch to execute fetching and to catch any errors.
+    loader.style.display = 'block';
     try {
         const response = await fetch(`https://api.nasa.gov/DONKI/FLR?startDate=${fromDate}&endDate=${endDate}&api_key=${api}`)
         if (response.ok) {
@@ -108,6 +110,8 @@ async function getData(fromDate, endDate) {
         }
     } catch (error) {
         console.error('Error:', error);
+    } finally {
+        loader.style.display = 'none';
     }
 }
 
