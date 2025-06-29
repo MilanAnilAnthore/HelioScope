@@ -16,7 +16,7 @@ const highestPeakTime = document.querySelector('.highestPeakTime')
 
 
 // Individual Table Flare Data DOM Elements
-
+const tableBody = document.querySelector('.tableBody');
 
 
 
@@ -101,6 +101,7 @@ async function getData(fromDate, endDate) {
             data = await response.json();
             let processedFlareData = processFlareData(data);
             summaryInjector(processedFlareData);
+            tableInjector(processedFlareData);
             return data;
         } else {
             throw new Error('Failed to fetch data');
@@ -312,13 +313,41 @@ function findMaxIntensity(rsINT) {
 
 
 function summaryInjector(processedFlareData) {
-    console.log(processedFlareData)
     totalFlares.innerText = processedFlareData.summaryResult.totalFlares;
     maxIntensityFlare.innerText = processedFlareData.highestIntensity;
     topActiveRegionClass.innerText = processedFlareData.topActiveRegionResult;
     highestPeakTime.innerText = processedFlareData.summaryResult.highestPeakTime + ' UTC';
 }
 
+function tableInjector(processedFlareData) {
+
+    for (res of processedFlareData.result) {
+        console.log(res);
+        var row = tableBody.insertRow(0);
+
+        var intensityCell = row.insertCell(0);
+        var instrumentCell = row.insertCell(1);
+        var solarLocationCell = row.insertCell(2);
+        var startTimeCell = row.insertCell(3);
+        var activeRegionCell = row.insertCell(4);
+        var durationCell = row.insertCell(5);
+        var flarePeakCell = row.insertCell(6);
+        var linkedEventsCell = row.insertCell(7);
+
+        intensityCell.innerHTML = res.intensity + res.magnitude;
+        instrumentCell.innerHTML = res.instrumentUsed;
+        solarLocationCell.innerHTML = res.location;
+        startTimeCell.innerHTML = res.beginTime;
+        activeRegionCell.innerHTML = res.activeRegion;
+        durationCell.innerHTML = res.duration;
+        flarePeakCell.innerHTML = res.peakTime;
+        if (res.linkedEvents == null) {
+            linkedEventsCell.innerHTML = 0;
+        } else {
+            linkedEventsCell.innerHTML = `${res.linkedEvents.length}`;
+        }
+    }
+}
 // Key Metrics:
 // - Total Flares
 // - Max Intensity Flare
