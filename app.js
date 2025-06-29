@@ -12,7 +12,7 @@ const pickerSearch = document.querySelector('.pickerSearch');
 const totalFlares = document.querySelector('.totalFlares');
 const maxIntensityFlare = document.querySelector('.maxIntensityFlare');
 const topActiveRegionClass = document.querySelector('.topActiveRegion')
-const highestPeakTime = document.querySelector('.highestPeakTime')
+const maxFlarePeakTime = document.querySelector('.maxFlarePeakTime')
 
 
 // Individual Table Flare Data DOM Elements
@@ -120,27 +120,29 @@ async function getData(fromDate, endDate) {
  */
 function processFlareData(data) {
     let result = [];
-    let highestPeakTimeMinutes = null;
-    let highestPeakTime;
+    // let highestPeakTimeMinutes = null;
+    // let highestPeakTime;
     let totalFlares = data.length;
 
-    // Helps to find the highestPeakTime of flare from the set of flares in the data
     for (let d of data) {
-        let duration;
-        if (d.peakTime) {
-            const p = new Date(d.peakTime);
-            let minutes = p.getTime();
-            if (minutes > highestPeakTimeMinutes) {
-                highestPeakTimeMinutes = minutes;
-                highestPeakTime = d.peakTime.slice(11, 16);
-            }
-        }
+
+
+        // Helps to find the highestPeakTime of flare from the set of flares in the data
+        // if (d.peakTime) {
+        //     const p = new Date(d.peakTime);
+        //     let minutes = p.getTime();
+        //     if (minutes > highestPeakTimeMinutes) {
+        //         highestPeakTimeMinutes = minutes;
+        //         highestPeakTime = d.peakTime.slice(11, 16);
+        //     }
+        // }
 
         /**
          * Helps to find the duration of each flares
          * If the endTime is null the difference between peakTime and beginTime is taken for duration
          * If the endTime is not null then the difference between endTime and beginTime is used to measure duration.
          */
+        let duration;
         if (d.endTime == null) {
             let bt = new Date(d.beginTime);
             let pt = new Date(d.peakTime);
@@ -220,14 +222,13 @@ function processFlareData(data) {
 
     // SummaryResult of data like peakTime and total flares.
     const summaryResult = {
-        highestPeakTime,
         totalFlares
     };
 
     let topActiveRegionResult = topActiveRegion(result);
-    let highestIntensity = findMaxIntensity(result);
+    let highestIntensityDuration = findMaxIntensity(result);
 
-    return { result, summaryResult, topActiveRegionResult, highestIntensity }
+    return { result, summaryResult, topActiveRegionResult, highestIntensityDuration }
 }
 
 
@@ -282,6 +283,7 @@ function topActiveRegion(rsAR) {
  * function to find the max intensity of flare from retrieved set of data
  * @param rsINT Parameter used to receive the data consisting of intensity and magnitude
  * @returns mergedIntensity - The highest intensity from the data
+ * @returns highINTFlareDuration - Duration of flare with the highest intensity
  */
 function findMaxIntensity(rsINT) {
     const powerLevels = {
@@ -294,6 +296,7 @@ function findMaxIntensity(rsINT) {
     let highestINT;
     let highestMAG;
     let highestPower = 0;
+    let highINTFlareDuration;
     for (let int of rsINT) {
         let intensity = int.intensity;
         let magnitude = int.magnitude;
@@ -304,19 +307,20 @@ function findMaxIntensity(rsINT) {
             highestPower = score;
             highestINT = intensity;
             highestMAG = magnitude
+            highINTFlareDuration = int.duration;
         }
     }
     let mergedIntensity = `${highestINT} ${highestMAG}`
 
-    return mergedIntensity
+    return { mergedIntensity, highINTFlareDuration }
 }
 
 
 function summaryInjector(processedFlareData) {
     totalFlares.innerText = processedFlareData.summaryResult.totalFlares;
-    maxIntensityFlare.innerText = processedFlareData.highestIntensity;
+    maxIntensityFlare.innerText = processedFlareData.highestIntensityDuration.mergedIntensity;
+    maxFlarePeakTime.innerText = processedFlareData.highestIntensityDuration.highINTFlareDuration;
     topActiveRegionClass.innerText = processedFlareData.topActiveRegionResult;
-    highestPeakTime.innerText = processedFlareData.summaryResult.highestPeakTime + ' UTC';
 }
 
 function clearTable() {
@@ -329,7 +333,6 @@ function tableInjector(processedFlareData) {
     clearTable();
 
     for (const res of processedFlareData.result) {
-        console.log(res);
         var row = tableBody.insertRow(0);
 
         var intensityCell = row.insertCell(0);
@@ -357,9 +360,9 @@ function tableInjector(processedFlareData) {
 }
 // Key Metrics:
 // - Total Flares
-// - Max Intensity Flare
-// - Top Active Region
+// - Max Flare Peak Time
 // - Highest Peak Time
+// - Top Active Region
 
 // Flare Details:
 // - Intensity
